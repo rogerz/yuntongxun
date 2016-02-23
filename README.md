@@ -1,6 +1,9 @@
 # YunTongXun
 
+[![Build Status](https://travis-ci.org/rogerz/yuntongxun.svg?branch=master)](https://travis-ci.org/rogerz/yuntongxun)
+
 Ruby SDK for [容联云通讯](http://www.yuntongxun.com/) development
+
 ## Installation
 
 Add this line to your application's Gemfile:
