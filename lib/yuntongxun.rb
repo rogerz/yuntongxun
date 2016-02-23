@@ -1,5 +1,5 @@
 require "yuntongxun/version"
 
-module Yuntongxun
+module YunTongXun
   # Your code goes here...
 end
