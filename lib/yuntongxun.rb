@@ -7,7 +7,6 @@ require 'net/https'
 
 module YunTongXun
   # Your code goes here...
-  class YTXError < StandardError ; end
   class RestClient
     # http://www.yuntongxun.com/activity/smsDevelop#tiyan
     VERSION = '2013-12-26'
@@ -21,7 +20,7 @@ module YunTongXun
 
     def url
       # URL格式：/2013-12-26/Accounts/{accountSid}/SMS/TemplateSMS?sig={SigParameter}
-      "#{@api}/#{@version}/Accounts#{@account_sid}/SMS/TemplateSMS"
+      "#{@api}/#{@version}/Accounts/#{@account_sid}/SMS/TemplateSMS?sig=#{sign}"
     end
 
     def sign
@@ -29,7 +28,7 @@ module YunTongXun
       # 1.使用MD5加密（账户Id + 账户授权令牌 + 时间戳）。其中账户Id和账户授权令牌根据url的验证级别对应主账户。
       # 时间戳是当前系统时间，格式"yyyyMMddHHmmss"。时间戳有效时间为24小时，如：20140416142030
       # 2.SigParameter参数需要大写，如不能写成sig=abcdefg而应该写成sig=ABCDEFG
-      Digest::MD5.digest(@account_sid + @token + timestamp).upcase
+      Digest::MD5.hexdigest(@account_sid + @auth_token + timestamp).upcase
     end
 
     def headers
@@ -43,37 +42,43 @@ module YunTongXun
       {
         'Accept' => 'application/json',
         'Content-Type' => 'application/json;charset=utf-8',
-        'Authorization' => Base64.encode64(@account_id + ':' + timestamp)
+        'Authorization' => Base64.strict_encode64(@account_sid + ':' + timestamp)
       }
     end
 
     def timestamp
-      @timestamp ||= Time.now.strftime("%Y%m%d%H%M%S")
+      Time.now.strftime("%Y%m%d%H%M%S")
     end
 
-    def json_content(to:, app_id:, template_id: 1, data: [])
+    def config(app_id:, template_id:)
+      @app_id = app_id
+      @template_id = template_id
+    end
+
+    def json_content(to:, data: [])
       # to	String	必选	短信接收端手机号码集合，用英文逗号分开，每批发送的手机号数量不得超过100个
       # appId String	必选	应用Id
       # templateId	String	必选	模板Id
       # datas	String	必选	内容数据外层节点
       # data String 可选  内容数据，用于替换模板中{序号}
-      raise YTXError.new('to must be an array whose length <= 100') unless to.is_a? Array and to.length <= 100
-      raise YTXError.new('data must be array') unless data.is_a? Array
+      fail 'to must be an array whose length <= 100' unless (to.is_a? Array) && (to.length <= 100)
+      fail 'data must be array' unless data.is_a? Array
+      fail 'app_id and template_id must be set' unless @app_id && @template_id
       {
         :to => to.join(','),
-        :appId => app_id,
-        :templateId => template_id,
+        :appId => @app_id,
+        :templateId => @template_id,
         :datas => data
       }.to_json
     end
 
-    def send
+    def send_sms(to:, data:)
       uri = URI.parse(url)
       https = Net::HTTP.new(uri.host, uri.port)
       https.use_ssl = true
-      request = Net::HTTP::Post.new(uri.path, headers)
-      request['sig'] = sign
-      request.body = json_content
+      request = Net::HTTP::Post.new(url, headers)
+      request.body = json_content(to: to, data: data)
+      # https.set_debug_output($stdout)
       https.request(request)
     end
   end
