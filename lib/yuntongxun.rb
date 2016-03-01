@@ -1,5 +1,6 @@
 require "yuntongxun/version"
 
+require 'json'
 require 'digest'
 require 'base64'
 require 'net/http'
@@ -78,7 +79,6 @@ module YunTongXun
       https.use_ssl = true
       request = Net::HTTP::Post.new(url, headers)
       request.body = json_content(to: to, data: data)
-      # https.set_debug_output($stdout)
       https.request(request)
     end
   end

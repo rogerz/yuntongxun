@@ -4,3 +4,4 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'webmock', '1.24.1'
+gem 'dotenv', '2.1.0'
