@@ -62,9 +62,9 @@ module YunTongXun
       # templateId	String	必选	模板Id
       # datas	String	必选	内容数据外层节点
       # data String 可选  内容数据，用于替换模板中{序号}
-      fail 'to must be an array whose length <= 100' unless (to.is_a? Array) && (to.length <= 100)
-      fail 'data must be array' unless data.is_a? Array
       fail 'app_id and template_id must be set' unless @app_id && @template_id
+      to = [to] unless to.is_a? Array
+      data = [data] unless data.is_a? Array
       {
         :to => to.join(','),
         :appId => @app_id,

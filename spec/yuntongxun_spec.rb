@@ -13,7 +13,7 @@ describe YunTongXun do
         auth_token: ENV['YTX_AUTH_TOKEN']
       )
     ytx.config(app_id: ENV['YTX_APP_ID'], template_id: 1)
-    response = ytx.send_sms(to: ['10086'], data: ['0000'])
-    expect(response).to be_instance_of Net::HTTPOK
+    response = ytx.send_sms(to: ENV['YTX_TEST_TO'], data: ['2016', 1])
+    expect(JSON.parse(response.body)).to have_key 'statusCode'
   end
 end
