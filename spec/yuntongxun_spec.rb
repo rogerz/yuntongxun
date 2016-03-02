@@ -12,8 +12,8 @@ describe YunTongXun do
         account_sid: ENV['YTX_ACCOUNT_SID'],
         auth_token: ENV['YTX_AUTH_TOKEN']
       )
-    ytx.config(app_id: ENV['YTX_APP_ID'], template_id: 1)
+    ytx.config(app_id: ENV['YTX_APP_ID'], template_id: ENV['YTX_SMS_TEMPLATE'])
     response = ytx.send_sms(to: ENV['YTX_TEST_TO'], data: ['2016', 1])
-    expect(JSON.parse(response.body)).to have_key 'statusCode'
+    expect(JSON.parse(response.body)['statusCode']).to eql '000000'
   end
 end
