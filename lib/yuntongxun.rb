@@ -73,7 +73,7 @@ module YunTongXun
       }.to_json
     end
 
-    def send_sms(to:, data:)
+    def send_sms(to:, data: [])
       uri = URI.parse(url)
       https = Net::HTTP.new(uri.host, uri.port)
       https.use_ssl = true
